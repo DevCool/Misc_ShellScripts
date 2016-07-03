@@ -549,11 +549,14 @@ install_blackarch() {
     if [[ "$INSTALLED" == "true" && "$loader_installed" == "true" ]]; then
         if [ "$x" != "true" ]; then
             if (whiptail --title "Arch Linux Installer - Bl4cK" --yesno "Would you like to install everything from BlackArch?" 10 60) then
-		curl -O https://blackarch.org/strap.sh &> /dev/null &
-                arch-chroot "$ARCH" sh strap.sh &> /dev/null &
+		curl -O https://blackarch.org/strap.sh "$ARCH"/root/strap.sh&> /dev/null &
+                pid=$! pri="$down" msg="Please wait while downloading blackarch bootstrap..." load
+                arch-chroot "$ARCH" ./root/strap.sh &> /dev/null &
                 pacstrap "$ARCH" blackarch &> /dev/null &
                 pid=$! pri="$down" msg="Please wait while installing blackarch..." load
                 x=true
+            else
+                reboot_system
             fi
         fi
     else
