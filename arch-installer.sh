@@ -553,9 +553,15 @@ install_blackarch() {
 		curl -O https://blackarch.org/strap.sh &> /dev/null && mv strap.sh "$ARCH"/root/strap.sh
                 chmod +x "$ARCH"/root/strap.sh
                 arch-chroot "$ARCH" ./root/strap.sh
-                arch-chroot "$ARCH" pacman -Sy blackarch &> /dev/null &
-                pid=$! pri=1 msg="Please wait while installing blackarch..." load
-                x=true
+                arch-chroot "$ARCH" pacman -Sy --force blackarch
+                if [ "$?" == "0" ]; then
+                    rm "$ARCH"/root/strap.sh
+                    x=true
+                else
+                    rm "$ARCH"/root/strap.sh
+                    whiptail --title "Blackarch Install" --msgbox "Error failed to install blackarch.\nContinuing to reboot." 10 60
+                    x=false
+                fi
             fi
         fi
     else
