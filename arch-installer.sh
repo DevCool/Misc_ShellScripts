@@ -553,8 +553,8 @@ install_blackarch() {
 		curl -O https://blackarch.org/strap.sh &> /dev/null && mv strap.sh "$ARCH"/root/strap.sh
                 chmod +x "$ARCH"/root/strap.sh
                 arch-chroot "$ARCH" ./root/strap.sh
-                pacstrap "$ARCH" blackarch &> /dev/null &
-                pid=$! pri="$down" msg="Please wait while installing blackarch..." load
+                arch-chroot "$ARCH" pacman -Sy blackarch &> /dev/null &
+                pid=$! pri=1 msg="Please wait while installing blackarch..." load
                 x=true
             fi
         fi
