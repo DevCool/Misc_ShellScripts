@@ -553,16 +553,10 @@ install_blackarch() {
 		curl -O https://blackarch.org/strap.sh &> /dev/null && mv strap.sh "$ARCH"/root/strap.sh
                 chmod +x "$ARCH"/root/strap.sh
                 arch-chroot "$ARCH" ./root/strap.sh
-                arch-chroot "$ARCH" pacman -Sy --force blackarch
-                if [ "$?" == "0" ]; then
-                    rm "$ARCH"/root/strap.sh
-                    x=true
-                else
-                    rm "$ARCH"/root/strap.sh
-                    whiptail --title "Blackarch Install" --msgbox "Error failed to install blackarch.\nContinuing to reboot." 10 60
-                    x=false
-                fi
-            fi
+                echo -en 'test_func() {\n pacman -Sy --force --noconfirm blackarch &> /dev/null &\n testerpid="$!"\npid="$!" pri=1 msg="Please wait while installing...\n  *This may take awhile" load\n\n if [ "$testerpid" == "0" ]; then\n  whiptail --title "Arch Linux Installer - Bl4cK ArCh" --msgbox "Install complete!" 15 60\nrm strap.sh install-black.sh\nelse\n  whiptail --title "Arch Linux Installer - Bl4cK ArCh" --msgbox "Install failed..." 15 60\n fi\n}\n\nload() {\n {\n  int="1"\n  while(true)\n  do\n\tproc=$(ps | grep "$pid")\nif [ "$?" -gt "0" ]; then break; fi\nsleep $pri\necho $int\nint=$((int+1))\ndone\necho 100\nsleep 1\n} | whiptail --title "Arch Linux Installer - Bl4cK ArCh" --gauge "$msg" 8 78 0\n}\n\ntest_func\n' > "$ARCH"/root/install-black.sh
+                chmod +x "$ARCH"/root/install-black.sh
+                arch-chroot "$ARCH" ./root/install-black.sh
+           fi
         fi
     else
 	whiptail --title "Test Message Box" --msgbox "Error no root filesystem installed at $ARCH \n Continuing to menu." 10 60
