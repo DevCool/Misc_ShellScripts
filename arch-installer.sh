@@ -506,6 +506,7 @@ configure_network() {
 }
 
 install_bootloader() {
+	# install grub bootloader
 	if [ "$INSTALLED" == "true" ]; then
 		if (whiptail --title "Arch Linux Installer" --yesno "Install GRUB onto /dev/$DRIVE? \n *Required to make bootable" 10 60) then
 			if (whiptail --title "Arch Linux Installer" --yesno "Install os-prober first \n *Required for dualboot" 10 60) then
@@ -530,6 +531,42 @@ install_bootloader() {
 			loader_installed=true
 			arch-chroot "$ARCH" grub-mkconfig -o /boot/grub/grub.cfg &> /dev/null &
 			pid=$! pri=0.5 msg="Configuring grub..." load
+			graphics
+		else
+			if (whiptail --title "Arch Linux Installer" --defaultno --yesno "WARNING! Are you sure you don't want a bootloader? Your system will not boot!" 10 60) then
+				main_menu
+			else
+				install_bootloader
+			fi
+		fi
+	else
+		whiptail --title "Test Message Box" --msgbox "Error no root filesystem installed at $ARCH \n Continuing to menu." 10 60
+		main_menu
+	fi
+
+	#install syslinux instead
+	if [ "$INSTALLED" == "true" ]; then
+		if (whiptail --title "Arch Linux Installer" --yesno "Install syslinux onto /dev/$DRIVE? \n *Required to make bootable" 10 60) then
+			if (whiptail --title "Arch Linux Installer" --yesno "Install os-prober first \n *Required for dualboot" 10 60) then
+				pacstrap "$ARCH" os-prober &> /dev/null &
+				pid=$! pri=0.5 msg="Installing os-prober..." load
+			fi
+			pacstrap "$ARCH" syslinux &> /dev/null &
+			pid=$! pri=1 msg="Installing syslinux onto /dev/$DRIVE" load
+			arch-chroot "$ARCH" syslinux-install_update -i -a -m
+			pid=$! pri=0.5 msg="Installing grub..." load
+			if [ "$crypted" == "true" ]; then
+				echo -en "DEFAULT arch\nPROMPT 1\nTIMEOUT 100\n\nLABEL arch\n\tMENU LABEL Arch Linux\n\tLINUX ../vmlinuz-linux\n\tAPPEND cryptdevice=/dev/lvm/lvroot:root root=/dev/mapper/root rw net.ifnames=0\n\tINITRD ../initramfs-linux.img\n\nLABEL arch-fallback\n\tMENU LABEL Arch Linux Fallback\n\tLINUX ../vmlinuz-linux\n\tAPPEND cryptdevice=/dev/lvm/lvroot:root root=/dev/mapper/root rw net.ifnames=0\n\tINITRD ../initramfs-linux-fallback.img\n\n" > "$ARCH"/boot/syslinux/syslinux.cfg
+				echo "/dev/$BOOT                    /boot           ext4           defaults        0       2" > "$ARCH"/etc/fstab
+				echo "/dev/mapper/root        /                      ext4            defaults       0       1" >> "$ARCH"/etc/fstab
+				echo "/dev/mapper/tmp       /tmp             tmpfs        defaults        0       0" >> "$ARCH"/etc/fstab
+				echo "tmp	       /dev/lvm/tmp	       /dev/urandom	tmp,cipher=aes-xts-plain64,size=256" >> "$ARCH"/etc/crypttab
+				if "$SWAP" ; then
+					echo "/dev/mapper/swap     none            swap          sw                    0       0" >> "$ARCH"/etc/fstab
+					echo "swap	/dev/lvm/swap	/dev/urandom	swap,cipher=aes-xts-plain64,size=256" >> "$ARCH"/etc/crypttab
+				fi
+			fi
+			loader_installed=true
 			graphics
 		else
 			if (whiptail --title "Arch Linux Installer" --defaultno --yesno "WARNING! Are you sure you don't want a bootloader? Your system will not boot!" 10 60) then
