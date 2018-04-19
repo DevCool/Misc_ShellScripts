@@ -560,7 +560,7 @@ install_bootloader() {
 					fi
 				fi
 				loader_installed=true
-				graphics
+#				graphics
 			else
 				if (whiptail --title "Arch Linux Installer" --defaultno --yesno "WARNING! Are you sure you don't want a bootloader? Your system will not boot!" 10 60) then
 					main_menu
@@ -573,7 +573,7 @@ install_bootloader() {
 		whiptail --title "Test Message Box" --msgbox "Error no root filesystem installed at $ARCH \n Continuing to menu." 10 60
 		main_menu
 	fi
-	main_menu
+#	main_menu
 }
 
 install_blackarch() {
