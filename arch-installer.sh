@@ -541,7 +541,6 @@ install_bootloader() {
 				pacstrap "$ARCH" syslinux &> /dev/null &
 				pid=$! pri=1 msg="Installing syslinux onto /dev/$DRIVE" load
 				arch-chroot "$ARCH" syslinux-install_update -i -a -m
-				pid=$! pri=0.5 msg="Installing syslinux..." load
 				if [ "$crypted" == "true" ]; then
 					echo -en "DEFAULT arch\nPROMPT 1\nTIMEOUT 100\n\nLABEL arch\n\tMENU LABEL Arch Linux\n\tLINUX ../vmlinuz-linux\n\tAPPEND cryptdevice=/dev/lvm/lvroot:root root=/dev/mapper/root rw net.ifnames=0\n\tINITRD ../initramfs-linux.img\n\nLABEL arch-fallback\n\tMENU LABEL Arch Linux Fallback\n\tLINUX ../vmlinuz-linux\n\tAPPEND cryptdevice=/dev/lvm/lvroot:root root=/dev/mapper/root rw net.ifnames=0\n\tINITRD ../initramfs-linux-fallback.img\n\n" > "$ARCH"/boot/syslinux/syslinux.cfg
 					echo "/dev/$BOOT                    /boot           ext4           defaults        0       2" > "$ARCH"/etc/fstab
@@ -560,8 +559,6 @@ install_bootloader() {
 						echo "/dev/$SWAP     none            swap          sw                    0       0" >> "$ARCH"/etc/fstab
 					fi
 				fi
-				arch-chroot "$ARCH" syslinux-install_update -u
-				pid=$! pri=0.5 msg="Configuring syslinux..." load
 				loader_installed=true
 				graphics
 			else
