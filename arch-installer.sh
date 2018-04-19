@@ -569,7 +569,7 @@ graphics() {
 	if [[ "$INSTALLED" == "true" && "$loader_installed" == "true" ]]; then
 		if [ "$x" != "true" ]; then
 			if (whiptail --title "Arch Linux Installer" --yesno "Would you like to install xorg-server now? \n *Select yes for a graphical interface" 10 60) then
-				pacstrap "$ARCH" xorg-server xorg-server-common xorg-server-devel &> /dev/null &
+				pacstrap "$ARCH" xorg-server xorg-server-common xorg-server-devel xorg-xinit xterm &> /dev/null &
 				pid=$! pri="$down" msg="Please wait while installing xorg-server..." load
 				x=true
 				if (whiptail --title "Arch Linux Installer" --yesno "Would you like to install graphics drivers now? If no default mesa drivers will be used." 10 60) then
