@@ -540,7 +540,7 @@ install_bootloader() {
 				fi
 				pacstrap "$ARCH" syslinux gptfdisk &> /dev/null &
 				pid=$! pri=1 msg="Downloading syslinux onto /dev/$DRIVE" load
-				arch-chroot "$ARCH" syslinux-install_update -i -a -m &> /dev/null &
+				arch-chroot "$ARCH" syslinux-install_update -i -a -m
 				pid=$! pri=1 msg="Installing syslinux onto /dev/$DRIVE" load
 				if [ "$crypted" == "true" ]; then
 					echo -en "DEFAULT arch\nPROMPT 1\nTIMEOUT 100\n\nLABEL arch\n\tMENU LABEL Arch Linux\n\tLINUX ../vmlinuz-linux\n\tAPPEND cryptdevice=/dev/lvm/lvroot:root root=/dev/mapper/root rw net.ifnames=0\n\tINITRD ../initramfs-linux.img\n\nLABEL arch-fallback\n\tMENU LABEL Arch Linux Fallback\n\tLINUX ../vmlinuz-linux\n\tAPPEND cryptdevice=/dev/lvm/lvroot:root root=/dev/mapper/root rw net.ifnames=0\n\tINITRD ../initramfs-linux-fallback.img\n\n" > "$ARCH"/boot/syslinux/syslinux.cfg
@@ -560,7 +560,7 @@ install_bootloader() {
 						echo "/dev/$SWAP     none            swap          sw                    0       0" >> "$ARCH"/etc/fstab
 					fi
 				fi
-				arch-chroot "$ARCH" syslinux-install_update -u &> /dev/null &
+				arch-chroot "$ARCH" syslinux-install_update -u
 				pid=$! pri=1 msg="Configuring syslinux onto /dev/$DRIVE" load
 				loader_installed=true
 				graphics
@@ -628,12 +628,12 @@ graphics() {
 									"xf86-video-ati"   "Open source AMD driver" 3>&1 1>&2 2>&3)
 									if [ "$?" -eq "0" ]; then
 										if [ "$multilib" == "true" ]; then
-											query="xf86-video-ati lib32-mesa"
+											query="xf86-video-ati lib32-mesa-libgl"
 										else
 											query="xf86-video-ati"
 										fi
 										if (whiptail --title "Arch Linux Installer" --yesno "Enable openGL support? \n Used for games and other graphics" 10 60) then
-											query="$query mesa"
+											query="$query mesa-libgl"
 										fi
 										GPU=set
 									fi
@@ -643,12 +643,12 @@ graphics() {
 									"xf86-video-intel"     "Open source Intel driver" 3>&1 1>&2 2>&3)
 									if [ "$?" -eq "0" ]; then
 										if [ "$multilib" == "true" ]; then
-											query="xf86-video-intel lib32-mesa"
+											query="xf86-video-intel lib32-mesa-libgl"
 										else
 											query="xf86-video-intel"
 										fi
 										if (whiptail --title "Arch Linux Installer" --yesno "Enable openGL support? \n Used for games and other graphics" 10 60) then
-											query="$query mesa"
+											query="$query mesa-libgl"
 										fi
 										GPU=set
 									fi
@@ -671,7 +671,7 @@ graphics() {
 									DRIV=$(whiptail --title "Arch Linux Installer" --menu "Provides graphics and features for virtualbox guests:" 15 60 4 \
 									"virtualbox-guest-additions" "-" 3>&1 1>&2 2>&3)
 									if [ "$?" -eq "0" ]; then
-										query="virtualbox-guest-dkms"
+										query="virtualbox-guest-utils"
 										echo -e "vboxguest\nvboxsf\nvboxvideo" > /etc/modules-load.d/vbox.conf
 										GPU=set
 									fi
@@ -720,16 +720,11 @@ graphics() {
 							fi
 						fi
 					;;
-					"cinnamon") start_term="exec cinnamon-session"
-						envr="cinnamon"
-						if (whiptail --title "Arch Linux Installer" --yesno "Install SLiM display manager?" 10 60) then
-							envr="$envr slim archlinux-themes-slim"
-							DM="slim.service"
-							if [ "$user_added" == "true" ]; then
-								echo "exec cinnamon-session" > "$ARCH"/home/"$user"/.xinitrc
-							else
-								echo "exec cinnamon-session" > "$ARCH"/root/.xinitrc
-							fi
+					"cinnamon") envr="cinnamon slim archlinux-themes-slim" DM="slim.service"
+						if [ "$user_added" == "true" ]; then
+							echo "exec gnome-session-cinnamon" > "$ARCH"/home/"$user"/.xinitrc
+						else
+							echo "exec gnome-session-cinnamon" > "$ARCH"/root/.xinitrc
 						fi
 					;;
 					"gnome")
