@@ -560,6 +560,8 @@ install_bootloader() {
 						echo "/dev/$SWAP     none            swap          sw                    0       0" >> "$ARCH"/etc/fstab
 					fi
 				fi
+				arch-chroot "$ARCH" syslinux-install_update -u
+				pid=$! pri=1 msg="Configuring syslinux onto /dev/$DRIVE" load
 				loader_installed=true
 				graphics
 			else
