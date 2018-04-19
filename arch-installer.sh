@@ -834,12 +834,18 @@ install_software() {
 		if (whiptail --title "Arch Linux Installer" --yesno "Would you like to install some common software?" 10 60) then
 			software=$(whiptail --title "Arch Linux Installer" --checklist "Choose your desired software \nUse spacebar to check/uncheck \npress enter when finished" 20 60 10 \
 						"openssh"       "Secure Shell Deamon" ON \
-						"vim" 	  	    "Popular Text Editor" ON \
-						"zsh"     	    "The Z shell" ON \
+						"vim" 	  	"Popular Text Editor" ON \
+						"zsh"     	"The Z shell" ON \
 						"wget"          "CLI web downloader" ON \
-						"tmux"    	    "Terminal multiplxer" OFF \
-						"screen"  	    "GNU Screen" OFF \
-						"netctl"	    "CLI Wireless Controls " OFF \
+						"tmux"    	"Terminal multiplxer" OFF \
+						"screen"  	"GNU Screen" OFF \
+						"netctl"	"CLI Wireless Controls" OFF \
+						"git"		"GIT repository snagger" OFF \
+						"subversion"	"SVN repository snagger" OFF \
+						"weechat"	"IRC client for CLI" OFF \
+						"pianobar"	"Music jukebox for CLI" OFF \
+						"wipe"		"Wipe a disk drive" OFF \
+						"leafpad"	"Basic text editor (like Notepad)" OFF \
 						"htop"          "CLI process Info" OFF \
 						"mplayer"       "Media Player" OFF \
 						"screenfetch"   "Display System Info" OFF \
