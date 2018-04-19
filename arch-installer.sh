@@ -538,9 +538,10 @@ install_bootloader() {
 					pacstrap "$ARCH" os-prober &> /dev/null &
 					pid=$! pri=0.5 msg="Installing os-prober..." load
 				fi
-				pacstrap "$ARCH" syslinux &> /dev/null &
-				pid=$! pri=1 msg="Installing syslinux onto /dev/$DRIVE" load
+				pacstrap "$ARCH" syslinux gptfdisk &> /dev/null &
+				pid=$! pri=1 msg="Downloading syslinux onto /dev/$DRIVE" load
 				arch-chroot "$ARCH" syslinux-install_update -i -a -m
+				pid=$! pri=1 msg="Installing syslinux onto /dev/$DRIVE" load
 				if [ "$crypted" == "true" ]; then
 					echo -en "DEFAULT arch\nPROMPT 1\nTIMEOUT 100\n\nLABEL arch\n\tMENU LABEL Arch Linux\n\tLINUX ../vmlinuz-linux\n\tAPPEND cryptdevice=/dev/lvm/lvroot:root root=/dev/mapper/root rw net.ifnames=0\n\tINITRD ../initramfs-linux.img\n\nLABEL arch-fallback\n\tMENU LABEL Arch Linux Fallback\n\tLINUX ../vmlinuz-linux\n\tAPPEND cryptdevice=/dev/lvm/lvroot:root root=/dev/mapper/root rw net.ifnames=0\n\tINITRD ../initramfs-linux-fallback.img\n\n" > "$ARCH"/boot/syslinux/syslinux.cfg
 					echo "/dev/$BOOT                    /boot           ext4           defaults        0       2" > "$ARCH"/etc/fstab
@@ -560,7 +561,7 @@ install_bootloader() {
 					fi
 				fi
 				loader_installed=true
-#				graphics
+				graphics
 			else
 				if (whiptail --title "Arch Linux Installer" --defaultno --yesno "WARNING! Are you sure you don't want a bootloader? Your system will not boot!" 10 60) then
 					main_menu
@@ -573,7 +574,7 @@ install_bootloader() {
 		whiptail --title "Test Message Box" --msgbox "Error no root filesystem installed at $ARCH \n Continuing to menu." 10 60
 		main_menu
 	fi
-#	main_menu
+	main_menu
 }
 
 install_blackarch() {
