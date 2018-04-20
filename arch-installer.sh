@@ -625,13 +625,25 @@ graphics() {
 								;;
 								"AMD")
 									DRIV=$(whiptail --title "Arch Linux Installer" --menu "Select your desired AMD driver \n Cancel if none" 15 60 4 \
-									"xf86-video-ati"   "Open source AMD driver" 3>&1 1>&2 2>&3)
+									"xf86-video-ati"   "Open source AMD driver" \
+									"xf86-video-amdgpu" "Open source AMD driver (Newer Cards)" 3>&1 1>&2 2>&3)
 									if [ "$?" -eq "0" ]; then
-										if [ "$multilib" == "true" ]; then
-											query="xf86-video-ati lib32-mesa"
-										else
-											query="xf86-video-ati"
-										fi
+										case "$DRIV" in
+											"xf86-video-ati")
+												if [ "$multilib" == "true" ]; then
+													query="xf86-video-ati lib32-mesa"
+												else
+													query="xf86-video-ati"
+												fi
+											;;
+											"xf86-video-amdgpu")
+												if [ "$multilib" == "true" ]; then
+													query="xf86-video-amdgpu lib32-mesa"
+												else
+													query="xf86-video-amdgpu"
+												fi
+											;;
+										esac
 										if (whiptail --title "Arch Linux Installer" --yesno "Enable openGL support? \n Used for games and other graphics" 10 60) then
 											query="$query mesa"
 										fi
