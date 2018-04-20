@@ -534,10 +534,6 @@ install_bootloader() {
 			graphics
 		else
 			if (whiptail --title "Arch Linux Installer" --yesno "Install syslinux onto /dev/$DRIVE? \n *Required to make bootable" 10 60) then
-				if (whiptail --title "Arch Linux Installer" --yesno "Install os-prober first \n *Required for dualboot" 10 60) then
-					pacstrap "$ARCH" os-prober &> /dev/null &
-					pid=$! pri=0.5 msg="Installing os-prober..." load
-				fi
 				pacstrap "$ARCH" syslinux gptfdisk &> /dev/null &
 				arch-chroot "$ARCH" syslinux-install_update -i -a -m &> /dev/null &
 				pid=$! pri=1 msg="Installing syslinux onto /dev/$DRIVE" load
