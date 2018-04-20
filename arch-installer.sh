@@ -586,10 +586,11 @@ install_blackarch() {
             if (whiptail --title "Arch Linux Installer - Bl4cK" --yesno "Would you like to install everything from BlackArch?" 10 60) then
 		curl -O https://blackarch.org/strap.sh &> /dev/null && mv strap.sh "$ARCH"/root/strap.sh
                 chmod +x "$ARCH"/root/strap.sh
-                arch-chroot "$ARCH" ./root/strap.sh
-                echo -en '#!/bin/bash\n\ntest_func() {\n pacman -Sy --force --noconfirm blackarch\n}\n\ntest_func\n' > "$ARCH"/root/install-black.sh
-                chmod +x "$ARCH"/root/install-black.sh
-                arch-chroot "$ARCH" ./root/install-black.sh
+                arch-chroot "$ARCH" /root/strap.sh
+                arch-chroot "$ARCH" pacman -Syy &> /dev/null &
+		pid=$! pri="$down" msg="Updating package databases..." load
+		arch-chroot "$ARCH" pacman -S --force --noconfirm blackarch
+		pid=$! pri="$down" msg="Please wait while install BlackArch...\n  * This may take a while." load
            fi
         fi
     else
@@ -625,14 +626,13 @@ graphics() {
 								;;
 								"AMD")
 									DRIV=$(whiptail --title "Arch Linux Installer" --menu "Select your desired AMD driver \n Cancel if none" 15 60 4 \
-									"xf86-video-ati"   "Open source AMD driver" \
-									"xf86-video-amdgpu" "Open source AMD driver (Newer Cards)" 3>&1 1>&2 2>&3)
+									"xf86-video-ati"	"Open source AMD driver" \
+									"xf86-video-amdgpu"	"Open source AMD driver (Newer Cards)" 3>&1 1>&2 2>&3)
 									if [ "$?" -eq "0" ]; then
 										if [ "$multilib" == "true" ]; then
-												query="$DRIV lib32-mesa"
-											else
-												query="$DRIV"
-											fi
+											query="$DRIV lib32-mesa"
+										else
+											query="$DRIV"
 										fi
 										if (whiptail --title "Arch Linux Installer" --yesno "Enable openGL support? \n Used for games and other graphics" 10 60) then
 											query="$query mesa"
@@ -645,9 +645,9 @@ graphics() {
 									"xf86-video-intel"     "Open source Intel driver" 3>&1 1>&2 2>&3)
 									if [ "$?" -eq "0" ]; then
 										if [ "$multilib" == "true" ]; then
-											query="xf86-video-intel lib32-mesa"
+											query="$DRIV lib32-mesa"
 										else
-											query="xf86-video-intel"
+											query="$DRIV"
 										fi
 										if (whiptail --title "Arch Linux Installer" --yesno "Enable openGL support? \n Used for games and other graphics" 10 60) then
 											query="$query mesa"
@@ -671,9 +671,9 @@ graphics() {
 								;;
 								"VBOX")
 									DRIV=$(whiptail --title "Arch Linux Installer" --menu "Provides graphics and features for virtualbox guests:" 15 60 4 \
-									"virtualbox-guest-additions" "-" 3>&1 1>&2 2>&3)
+									"virtualbox-guest-modules-arch" "Virtualbox Video Drivers" 3>&1 1>&2 2>&3)
 									if [ "$?" -eq "0" ]; then
-										query="virtualbox-guest-dkms"
+										query="$DRIV"
 										echo -e "vboxguest\nvboxsf\nvboxvideo" > /etc/modules-load.d/vbox.conf
 										GPU=set
 									fi
