@@ -628,7 +628,7 @@ graphics() {
 									"xf86-video-ati"   "Open source AMD driver" \
 									"xf86-video-amdgpu" "Open source AMD driver (Newer Cards)" 3>&1 1>&2 2>&3)
 									if [ "$?" -eq "0" ]; then
-										case "$DRIV" in
+										case $DRIV in
 											"xf86-video-ati")
 												if [ "$multilib" == "true" ]; then
 													query="xf86-video-ati lib32-mesa"
