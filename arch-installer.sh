@@ -539,7 +539,6 @@ install_bootloader() {
 					pid=$! pri=0.5 msg="Installing os-prober..." load
 				fi
 				pacstrap "$ARCH" syslinux gptfdisk &> /dev/null &
-				pid=$! pri=1 msg="Downloading syslinux onto /dev/$DRIVE" load
 				arch-chroot "$ARCH" syslinux-install_update -i -a -m &> /dev/null &
 				pid=$! pri=1 msg="Installing syslinux onto /dev/$DRIVE" load
 				if [ "$crypted" == "true" ]; then
