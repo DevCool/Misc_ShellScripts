@@ -343,7 +343,7 @@ install_base() {
 		if (whiptail --title "Arch Linux Installer" --yesno "Begin installing Arch Linux base onto /dev/$DRIVE?" 10 60) then
 			echo -e ${BluBG}
 			pacstrap "$ARCH" base base-devel libnewt &> /dev/null &
-			pid=$! pri="$down" msg="Please wait while we install Arch Linux... \n *This may take awhile" load
+			pid=$! pri="$down" msg="Please wait while we install base... \n *This may take awhile" load
 			if [ "$?" -eq "0" ]; then
 				INSTALLED=true
 			else
@@ -536,30 +536,38 @@ install_bootloader() {
 			if (whiptail --title "Arch Linux Installer" --yesno "Install syslinux onto /dev/$DRIVE? \n *Required to make bootable" 10 60) then
 				pacstrap "$ARCH" syslinux gptfdisk &> /dev/null &
 				pid=$! pri=1 msg="Downloading syslinux onto /dev/$DRIVE" load
-				arch-chroot "$ARCH" syslinux-install_update -i -a -m &> /dev/null &
-				pid=$! pri=1 msg="Installing syslinux onto /dev/$DRIVE" load
-				if [ "$crypted" == "true" ]; then
-					echo -en "DEFAULT arch\nPROMPT 1\nTIMEOUT 100\n\nLABEL arch\n\tMENU LABEL Arch Linux\n\tLINUX ../vmlinuz-linux\n\tAPPEND cryptdevice=/dev/lvm/lvroot:root root=/dev/mapper/root rw net.ifnames=0\n\tINITRD ../initramfs-linux.img\n\nLABEL arch-fallback\n\tMENU LABEL Arch Linux Fallback\n\tLINUX ../vmlinuz-linux\n\tAPPEND cryptdevice=/dev/lvm/lvroot:root root=/dev/mapper/root rw net.ifnames=0\n\tINITRD ../initramfs-linux-fallback.img\n\n" > "$ARCH"/boot/syslinux/syslinux.cfg
-					echo "/dev/$BOOT                    /boot           ext4           defaults        0       2" > "$ARCH"/etc/fstab
-					echo "/dev/mapper/root        /                      ext4            defaults       0       1" >> "$ARCH"/etc/fstab
-					echo "/dev/mapper/tmp       /tmp             tmpfs        defaults        0       0" >> "$ARCH"/etc/fstab
-					echo "tmp	       /dev/lvm/tmp	       /dev/urandom	tmp,cipher=aes-xts-plain64,size=256" >> "$ARCH"/etc/crypttab
-					if "$SWAP" ; then
-						echo "/dev/mapper/swap     none            swap          sw                    0       0" >> "$ARCH"/etc/fstab
-						echo "swap	/dev/lvm/swap	/dev/urandom	swap,cipher=aes-xts-plain64,size=256" >> "$ARCH"/etc/crypttab
+				if [ "$?" -eq "0" ]; then
+					arch-chroot "$ARCH" syslinux-install_update -i -a -m &> /dev/null &
+					pid=$! pri=1 msg="Installing syslinux onto /dev/$DRIVE" load
+					if [ "$crypted" == "true" ]; then
+						echo -en "DEFAULT arch\nPROMPT 1\nTIMEOUT 100\n\nLABEL arch\n\tMENU LABEL Arch Linux\n\tLINUX ../vmlinuz-linux\n\tAPPEND cryptdevice=/dev/lvm/lvroot:root root=/dev/mapper/root rw net.ifnames=0\n\tINITRD ../initramfs-linux.img\n\nLABEL arch-fallback\n\tMENU LABEL Arch Linux Fallback\n\tLINUX ../vmlinuz-linux\n\tAPPEND cryptdevice=/dev/lvm/lvroot:root root=/dev/mapper/root rw net.ifnames=0\n\tINITRD ../initramfs-linux-fallback.img\n\n" > "$ARCH"/boot/syslinux/syslinux.cfg
+						echo "/dev/$BOOT                    /boot           ext4           defaults        0       2" > "$ARCH"/etc/fstab
+						echo "/dev/mapper/root        /                      ext4            defaults       0       1" >> "$ARCH"/etc/fstab
+						echo "/dev/mapper/tmp       /tmp             tmpfs        defaults        0       0" >> "$ARCH"/etc/fstab
+						echo "tmp	       /dev/lvm/tmp	       /dev/urandom	tmp,cipher=aes-xts-plain64,size=256" >> "$ARCH"/etc/crypttab
+						if "$SWAP" ; then
+							echo "/dev/mapper/swap     none            swap          sw                    0       0" >> "$ARCH"/etc/fstab
+							echo "swap	/dev/lvm/swap	/dev/urandom	swap,cipher=aes-xts-plain64,size=256" >> "$ARCH"/etc/crypttab
+						fi
+					else
+						echo -en "DEFAULT arch\nPROMPT 1\nTIMEOUT 100\n\nLABEL arch\n\tMENU LABEL Arch Linux\n\tLINUX ../vmlinuz-linux\n\tAPPEND root=/dev/$ROOT rw net.ifnames=0\n\tINITRD ../initramfs-linux.img\n\nLABEL arch-fallback\n\tMENU LABEL Arch Linux Fallback\n\tLINUX ../vmlinuz-linux\n\tAPPEND root=/dev/$ROOT rw net.ifnames=0\n\tINITRD ../initramfs-linux-fallback.img\n\n" > "$ARCH"/boot/syslinux/syslinux.cfg
+						echo "/dev/$BOOT                    /boot           ext4           defaults        0       2" > "$ARCH"/etc/fstab
+						echo "/dev/$ROOT        /                      ext4            defaults       0       1" >> "$ARCH"/etc/fstab
+						if "$SWAP" ; then
+							echo "/dev/$SWAP     none            swap          sw                    0       0" >> "$ARCH"/etc/fstab
+						fi
 					fi
+					arch-chroot "$ARCH" syslinux-install_update -u &> /dev/null &
+					pid=$! pri=1 msg="Configuring syslinux onto /dev/$DRIVE" load
+					loader_installed=true
+					graphics
 				else
-					echo -en "DEFAULT arch\nPROMPT 1\nTIMEOUT 100\n\nLABEL arch\n\tMENU LABEL Arch Linux\n\tLINUX ../vmlinuz-linux\n\tAPPEND root=/dev/$ROOT rw net.ifnames=0\n\tINITRD ../initramfs-linux.img\n\nLABEL arch-fallback\n\tMENU LABEL Arch Linux Fallback\n\tLINUX ../vmlinuz-linux\n\tAPPEND root=/dev/$ROOT rw net.ifnames=0\n\tINITRD ../initramfs-linux-fallback.img\n\n" > "$ARCH"/boot/syslinux/syslinux.cfg
-					echo "/dev/$BOOT                    /boot           ext4           defaults        0       2" > "$ARCH"/etc/fstab
-					echo "/dev/$ROOT        /                      ext4            defaults       0       1" >> "$ARCH"/etc/fstab
-					if "$SWAP" ; then
-						echo "/dev/$SWAP     none            swap          sw                    0       0" >> "$ARCH"/etc/fstab
+					if (whiptail --title "Arch Linux Installer" --msgbox "Failed to install syslinux on $ARCH." 10 60) then
+						install_bootloader
+					else
+						main_menu
 					fi
 				fi
-				arch-chroot "$ARCH" syslinux-install_update -u &> /dev/null &
-				pid=$! pri=1 msg="Configuring syslinux onto /dev/$DRIVE" load
-				loader_installed=true
-				graphics
 			else
 				if (whiptail --title "Arch Linux Installer" --defaultno --yesno "WARNING! Are you sure you don't want a bootloader? Your system will not boot!" 10 60) then
 					main_menu
