@@ -851,6 +851,12 @@ install_software() {
 						"blender"		"3D Animation Software" OFF \
 						"mousepad"		"Like Notepad in Windows" OFF \
 						"yaourt"		"Package Manager for AUR" OFF \
+						"mpv"			"Movie player based on mplayer" OFF \
+						"youtube-dl"		"Python script to download from Youtube.com" OFF \
+						"ffmpeg"		"Multimedia Audio/Video Library" OFF \
+						"cdrtools"		"cdrtools supporting CD, DVD and BluRay" OFF \
+						"libisoburn"		"Frontend for libburn and libisofs" OFF \
+						"libisofs"		"Backup files on hard disk to ISO" OFF \
 						"imagemagick"		"Image Manipulator for X" OFF \
 						"xorg-fonts-100dpi"	"X fonts 100 dpi" OFF \
 						"xorg-fonts-75dpi"	"X fonts 75 dpi" OFF \
