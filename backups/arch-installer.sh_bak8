@@ -608,7 +608,7 @@ graphics() {
 	if [[ "$INSTALLED" == "true" && "$loader_installed" == "true" ]]; then
 		if [ "$x" != "true" ]; then
 			if (whiptail --title "Arch Linux Installer" --yesno "Would you like to install xorg-server now? \n *Select yes for a graphical interface" 10 60) then
-				pacstrap "$ARCH" xorg-server xorg-server-common xorg-server-devel xorg-server-devel xorg-server-xdmx xorg-server-xephyr xorg-server-xnest xorg-server-xvfb xorg-server-xwayland xorg-xinput xorg-xinit xterm &> /dev/null &
+				pacstrap "$ARCH" xorg-server xorg-server-common xorg-server-devel xorg-xinit xterm &> /dev/null &
 				pid=$! pri="$down" msg="Please wait while installing xorg-server..." load
 				x=true
 				if (whiptail --title "Arch Linux Installer" --yesno "Would you like to install graphics drivers now? If no default mesa drivers will be used." 10 60) then
@@ -702,7 +702,8 @@ graphics() {
 				"cinnamon" "Eligant DE" \
 				"openbox"  "Stacking WM" \
 				"fluxbox"  "Light WM" \
-				"awesome"  "Awesome WM" 3>&1 1>&2 2>&3)
+				"awesome"  "Awesome WM" \
+				"dwm"      "Dynamic WM" 3>&1 1>&2 2>&3)
 				if [ "$?" -gt "0" ]; then
 					if (whiptail --title "Arch Linux Installer" --yesno "Are you sure you sure you dont want a desktop? \nYou will be booted into a command line" 10 60) then
 						install_software
@@ -802,6 +803,7 @@ graphics() {
 					;;
 
 					"awesome") envr="awesome" start_term="exec awesome" ;;
+					"dwm") envr="dwm" start_term="exec dwm" ;;
 					"i3") envr="i3" start_term="exec i3" ;;
 				esac
 				if [ -n "$envr" ]; then
@@ -850,11 +852,14 @@ install_software() {
 						"mousepad"		"Like Notepad in Windows" OFF \
 						"yaourt"		"Package Manager for AUR" OFF \
 						"mpv"			"Movie player based on mplayer" OFF \
+						"youtube-dl"		"Python script to download from Youtube.com" OFF \
 						"ffmpeg"		"Multimedia Audio/Video Library" OFF \
-						"cdrtools"		"Supporting CD, DVD and BluRay" OFF \
-						"libisoburn"		"Frontend for libburn & libisofs" OFF \
+						"cdrtools"		"cdrtools supporting CD, DVD and BluRay" OFF \
+						"libisoburn"		"Frontend for libburn and libisofs" OFF \
 						"libisofs"		"Backup files on hard disk to ISO" OFF \
 						"imagemagick"		"Image Manipulator for X" OFF \
+						"xorg-fonts-100dpi"	"X fonts 100 dpi" OFF \
+						"xorg-fonts-75dpi"	"X fonts 75 dpi" OFF \
 						"ruby"			"Ruby Programming Language" OFF \
 						"subversion"		"SVN repository snagger" OFF \
 						"weechat"		"IRC client for CLI" OFF \
